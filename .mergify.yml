@@ -34,3 +34,12 @@ pull_request_rules:
         approved: true
         changes_requested: false
         when: synchronize
+
+  - name: VM3 classic codeowner personal proof 260924
+    conditions:
+      - base = vm3-classic-codeowner-personal-base-260924
+      - title = VM3 CLASSIC CODEOWNER PERSONAL 260924
+    actions:
+      merge:
+        method: squash
+        merge_bot_account: livastic-vm3-primary-tmp-260920
