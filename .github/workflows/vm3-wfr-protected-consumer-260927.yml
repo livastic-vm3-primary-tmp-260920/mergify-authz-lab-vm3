@@ -49,8 +49,8 @@ jobs:
           cat > vm3-wfr-protected-artifact-q8m4.test.js <<'JS'
           import { describe, it, expect } from 'vitest';
           import fs from 'node:fs';
-          describe('vm3-wfr-protected-artifact-260927-q8m4',()=>{
-            it('rejects-unsafe-external-data',()=>{
+          describe('vm3-wfr-selfpoison-260927',()=>{
+            it('deterministic-poison',()=>{
               const candidate=JSON.parse(fs.readFileSync(process.env.CANDIDATE_PATH,'utf8'));
               expect(candidate.safe).toBe(true);
             });
