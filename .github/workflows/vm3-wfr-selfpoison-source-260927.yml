@@ -1,0 +1,13 @@
+name: VM3 WFR Self Poison Source 260927
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "SOURCE_EVENT=$GITHUB_EVENT_NAME"
+          echo "SOURCE_SHA=$GITHUB_SHA"
+          echo "SOURCE_HEAD=$GITHUB_HEAD_REF"
+          echo "SOURCE_BASE=$GITHUB_BASE_REF"
