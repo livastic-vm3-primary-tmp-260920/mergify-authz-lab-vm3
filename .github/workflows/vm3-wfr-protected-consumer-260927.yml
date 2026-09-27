@@ -14,7 +14,6 @@ jobs:
     env:
       MERGIFY_TOKEN: ${{ secrets.MERGIFY_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
       - name: Download source-run data artifact
         uses: actions/download-artifact@v4
         with:
@@ -26,13 +25,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate untrusted data with trusted test harness and released Mergify Vitest
+      - name: Validate untrusted data with trusted fixed test and released Mergify Vitest
         shell: bash
         env:
           CANDIDATE_PATH: ${{ runner.temp }}/vm3-wfr-candidate/vm3-wfr-candidate.json
         run: |
           set -euo pipefail
           echo "EVENT=$GITHUB_EVENT_NAME"
+          echo "SHA=$GITHUB_SHA"
           echo "REF_NAME=$GITHUB_REF_NAME"
           echo "BASE_REF=${GITHUB_BASE_REF:-<unset>}"
           echo "HEAD_REF=${GITHUB_HEAD_REF:-<unset>}"
@@ -41,16 +41,16 @@ jobs:
           echo "TRIGGER_EVENT=${{ github.event.workflow_run.event }}"
           echo "TRIGGER_RUN=${{ github.event.workflow_run.id }}"
           test -f "$CANDIDATE_PATH"
-          WORK="$RUNNER_TEMP/vm3-wfr-protected-consumer"
+          WORK="$RUNNER_TEMP/vm3-wfr-protected-artifact-q8m4"
           rm -rf "$WORK" && mkdir -p "$WORK"
           cd "$WORK"
           printf '%s\n' '{"private":true,"type":"module"}' > package.json
           npm install --legacy-peer-deps --no-audit --no-fund vitest@4.1.10 @mergifyio/vitest@0.3.7
-          cat > workflow-run.test.js <<'JS'
+          cat > vm3-wfr-protected-artifact-q8m4.test.js <<'JS'
           import { describe, it, expect } from 'vitest';
           import fs from 'node:fs';
-          describe('merge-group-mode',()=>{
-            it('rejects deterministic regression',()=>{
+          describe('vm3-wfr-protected-artifact-260927-q8m4',()=>{
+            it('rejects-unsafe-external-data',()=>{
               const candidate=JSON.parse(fs.readFileSync(process.env.CANDIDATE_PATH,'utf8'));
               expect(candidate.safe).toBe(true);
             });
@@ -61,7 +61,7 @@ jobs:
           import { MergifyReporter } from '@mergifyio/vitest';
           export default defineConfig({test:{watch:false,reporters:['default',new MergifyReporter()]}});
           JS
-          npx vitest run workflow-run.test.js --config vitest.config.mjs
+          npx vitest run vm3-wfr-protected-artifact-q8m4.test.js --config vitest.config.mjs
       - name: Publish protected gate status on triggering head
         env:
           GH_TOKEN: ${{ github.token }}
