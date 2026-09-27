@@ -1,0 +1,29 @@
+name: VM3 WFR Protected Source 260927
+on:
+  pull_request:
+    branches: [vm3-wfr-protected-base-260927]
+permissions:
+  contents: read
+jobs:
+  source-control:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run deterministic PR regression without Mergify
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "SOURCE_EVENT=$GITHUB_EVENT_NAME"
+          echo "SOURCE_SHA=$GITHUB_SHA"
+          echo "SOURCE_HEAD=$GITHUB_HEAD_REF"
+          echo "SOURCE_BASE=$GITHUB_BASE_REF"
+          WORK="$RUNNER_TEMP/vm3-wfr-protected-source"
+          rm -rf "$WORK" && mkdir -p "$WORK"
+          cp "$GITHUB_WORKSPACE/vm3-wfr-protected-regression.test.js" "$WORK/workflow-run.test.js"
+          cd "$WORK"
+          printf '%s\n' '{"private":true,"type":"module"}' > package.json
+          npm install --legacy-peer-deps --no-audit --no-fund vitest@4.1.10
+          npx vitest run workflow-run.test.js
