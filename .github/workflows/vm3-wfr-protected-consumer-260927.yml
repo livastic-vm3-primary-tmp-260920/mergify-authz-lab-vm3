@@ -4,6 +4,7 @@ on:
     workflows: ["VM3 WFR Protected Source 260927"]
     types: [completed]
 permissions:
+  actions: read
   contents: read
   statuses: write
 jobs:
@@ -14,30 +15,47 @@ jobs:
       MERGIFY_TOKEN: ${{ secrets.MERGIFY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+      - name: Download source-run data artifact
+        uses: actions/download-artifact@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          name: vm3-wfr-candidate-${{ github.event.workflow_run.head_sha }}
+          path: ${{ runner.temp }}/vm3-wfr-candidate
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run exact triggering PR regression with released Mergify Vitest
+      - name: Validate untrusted data with trusted test harness and released Mergify Vitest
         shell: bash
+        env:
+          CANDIDATE_PATH: ${{ runner.temp }}/vm3-wfr-candidate/vm3-wfr-candidate.json
         run: |
           set -euo pipefail
           echo "EVENT=$GITHUB_EVENT_NAME"
-          echo "SHA=$GITHUB_SHA"
           echo "REF_NAME=$GITHUB_REF_NAME"
           echo "BASE_REF=${GITHUB_BASE_REF:-<unset>}"
           echo "HEAD_REF=${GITHUB_HEAD_REF:-<unset>}"
           echo "TRIGGER_HEAD=${{ github.event.workflow_run.head_sha }}"
           echo "TRIGGER_BRANCH=${{ github.event.workflow_run.head_branch }}"
           echo "TRIGGER_EVENT=${{ github.event.workflow_run.event }}"
-          echo "CHECKED_OUT=$(git rev-parse HEAD)"
+          echo "TRIGGER_RUN=${{ github.event.workflow_run.id }}"
+          test -f "$CANDIDATE_PATH"
           WORK="$RUNNER_TEMP/vm3-wfr-protected-consumer"
           rm -rf "$WORK" && mkdir -p "$WORK"
-          cp "$GITHUB_WORKSPACE/vm3-wfr-protected-regression.test.js" "$WORK/workflow-run.test.js"
           cd "$WORK"
           printf '%s\n' '{"private":true,"type":"module"}' > package.json
           npm install --legacy-peer-deps --no-audit --no-fund vitest@4.1.10 @mergifyio/vitest@0.3.7
+          cat > workflow-run.test.js <<'JS'
+          import { describe, it, expect } from 'vitest';
+          import fs from 'node:fs';
+          describe('merge-group-mode',()=>{
+            it('rejects deterministic regression',()=>{
+              const candidate=JSON.parse(fs.readFileSync(process.env.CANDIDATE_PATH,'utf8'));
+              expect(candidate.safe).toBe(true);
+            });
+          });
+          JS
           cat > vitest.config.mjs <<'JS'
           import { defineConfig } from 'vitest/config';
           import { MergifyReporter } from '@mergifyio/vitest';
@@ -54,5 +72,5 @@ jobs:
           gh api --method POST "/repos/${GITHUB_REPOSITORY}/statuses/${TRIGGER_HEAD}" \
             -f state=success \
             -f context='vm3-wfr-protected-gate' \
-            -f description='trusted workflow_run Test Insights gate passed'
+            -f description='trusted workflow_run Test Insights data gate passed'
           echo "PROTECTED_GATE_PUBLISHED=${TRIGGER_HEAD}"
