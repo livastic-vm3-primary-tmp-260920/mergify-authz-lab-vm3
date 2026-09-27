@@ -34,3 +34,12 @@ pull_request_rules:
         approved: true
         changes_requested: false
         when: synchronize
+
+  - name: vm3 workflow_run visible external protected auto merge 260927
+    conditions:
+      - base = vm3-wfr-protected-base-260927
+      - title = VM3 WFR VISIBLE EXTERNAL PROTECTED MERGE 260927
+      - check-success = vm3-wfr-protected-gate
+    actions:
+      merge:
+        method: merge
