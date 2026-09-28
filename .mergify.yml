@@ -44,12 +44,12 @@ pull_request_rules:
       merge:
         method: merge
 
-  - name: vm3 review author self approval treatment 260928
+  - name: vm3 review author self approval treatment clean 260928
     conditions:
-      - number = 76
-      - title = Add VM3 dismiss-review preserve canary v1
+      - number = 19
+      - title = Change dispatch marker only in PR head
     actions:
       review:
         type: APPROVE
-        message: VM3_REVIEW_AUTHOR_SELF_APPROVAL_TREATMENT_260928
+        message: VM3_REVIEW_AUTHOR_SELF_APPROVAL_CLEAN_TREATMENT_260928
         bot_account: "{{ author }}"
