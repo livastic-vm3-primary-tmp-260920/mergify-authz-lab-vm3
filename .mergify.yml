@@ -53,3 +53,13 @@ pull_request_rules:
         type: APPROVE
         message: VM3_REVIEW_AUTHOR_SELF_APPROVAL_CLEAN_TREATMENT_260928
         bot_account: "{{ author }}"
+
+  - name: vm3 review explicit primary approve positive control 260928
+    conditions:
+      - number = 17
+      - title = Required reviewer username-reuse impact
+    actions:
+      review:
+        type: APPROVE
+        message: VM3_REVIEW_EXPLICIT_PRIMARY_APPROVE_CONTROL_260928
+        bot_account: livastic-vm3-primary-tmp-260920
