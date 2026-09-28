@@ -43,3 +43,13 @@ pull_request_rules:
     actions:
       merge:
         method: merge
+
+  - name: vm3 review author comment control 260928
+    conditions:
+      - number = 76
+      - title = Add VM3 dismiss-review preserve canary v1
+    actions:
+      review:
+        type: COMMENT
+        message: VM3_REVIEW_AUTHOR_COMMENT_CONTROL_260928
+        bot_account: "{{ author }}"
