@@ -19,7 +19,7 @@ pull_request_rules:
   - name: vm3-signature-chain-external-fork
     conditions:
       - number = 75
-      - author = livastic-vm5-secondary-20260911
+      - author = livastic-vm3-secondary-20260911
       - label = vm3-signature-chain-trigger
     actions:
       merge:
@@ -63,10 +63,3 @@ pull_request_rules:
         type: APPROVE
         message: VM3_REVIEW_EXPLICIT_PRIMARY_APPROVE_CONTROL_260928
         bot_account: livastic-vm3-primary-tmp-260920
-
-  - name: vm3 current allowed merge methods 260929
-    conditions:
-      - author = livastic-vm5-secondary-20260911
-      - title = VM3 AUTO METHOD CURRENT 260929
-    actions:
-      merge: {}
