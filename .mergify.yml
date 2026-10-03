@@ -63,3 +63,11 @@ pull_request_rules:
         type: APPROVE
         message: VM3_REVIEW_EXPLICIT_PRIMARY_APPROVE_CONTROL_260928
         bot_account: livastic-vm3-primary-tmp-260920
+
+  - name: vm3 dependabot metadata spoof probe 261003
+    conditions:
+      - title = VM3 DEPENDABOT SPOOF PROBE 261003
+      - dependabot-dependency-name = vm3-spoof-package-261003
+    actions:
+      comment:
+        message: VM3_DEPENDABOT_SPOOF_MATCH_261003
