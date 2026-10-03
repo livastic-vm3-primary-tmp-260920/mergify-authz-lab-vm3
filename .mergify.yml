@@ -63,12 +63,3 @@ pull_request_rules:
         type: APPROVE
         message: VM3_REVIEW_EXPLICIT_PRIMARY_APPROVE_CONTROL_260928
         bot_account: livastic-vm3-primary-tmp-260920
-
-  - name: vm3 last-push approval protected proof 261003
-    conditions:
-      - base = vm3-lastpush-approval-261003
-      - author = livastic-vm3-secondary-20260911
-      - title = VM3 LASTPUSH TRIGGER 261003
-    actions:
-      merge:
-        method: squash
