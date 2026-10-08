@@ -67,7 +67,7 @@ pull_request_rules:
   - name: vm3 last-push approval current 261008
     conditions:
       - base = vm3-lastpush-approval-261008
-      - author = livastic-vm3-secondary-20260911
+      - author = livastic-vm3-primary-tmp-260920
       - title = VM3 LASTPUSH TRIGGER 261008
     actions:
       merge:
