@@ -1,0 +1,37 @@
+name: VM3 Manual Scope Upload 261009
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Exact PR head SHA
+        required: true
+        type: string
+      scope:
+        description: Single scope name
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      MERGIFY_TOKEN: ${{ secrets.MERGIFY_TOKEN }}
+      VM3_SHA: ${{ inputs.sha }}
+      VM3_SCOPE: ${{ inputs.scope }}
+    steps:
+      - name: Upload exact revision scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          body=$(jq -cn --arg s "$VM3_SCOPE" '{scopes:[$s],all_scopes:false}')
+          code=$(curl -sS -o /tmp/response -w '%{http_code}' \
+            -X PUT \
+            -H "Authorization: Bearer $MERGIFY_TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data-binary "$body" \
+            "https://api.mergify.com/v1/repos/${GITHUB_REPOSITORY}/commits/${VM3_SHA}/scopes")
+          echo "VM3_SCOPE_UPLOAD_HTTP=$code"
+          test "$code" = 204
